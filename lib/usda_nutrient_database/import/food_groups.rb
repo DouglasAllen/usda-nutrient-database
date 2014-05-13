@@ -1,19 +1,18 @@
 module UsdaNutrientDatabase
   module Import
-    class FoodGroups < Base
-
-      private
-
-      def find_or_initialize(row)
-        UsdaNutrientDatabase::FoodGroup.find_or_initialize_by(code: row[0])
-      end
-
-      def columns
-        @columns ||= %w(code description)
-      end
+    class FoodGroups
+      FileImporter.register_file(self)
 
       def filename
         'FD_GROUP.txt'
+      end
+
+      def column_names
+        [:code, :description]
+      end
+
+      def model
+        UsdaNutrientDatabase::FoodGroup
       end
 
       def log_import_started

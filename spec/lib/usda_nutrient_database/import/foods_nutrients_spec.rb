@@ -1,13 +1,27 @@
 require 'spec_helper'
 
-describe UsdaNutrientDatabase::Import::FoodsNutrients do
-  let(:importer) { described_class.new('spec/support/sr25') }
+module UsdaNutrientDatabase::Import
+  describe FoodsNutrients do
+    let(:archive_importer) do
+      ArchiveImporter.new('spec/support', version: 'sr25')
+    end
 
-  describe '#import' do
-    before { importer.import }
+    let(:file) do
+      described_class.new
+    end
 
-    it do
-      expect(UsdaNutrientDatabase::FoodsNutrient.count).to eql(5)
+    let(:file_importer) do
+      FileImporter.new(archive_importer, file)
+    end
+
+    def model
+      UsdaNutrientDatabase::FoodsNutrient
+    end
+
+    describe '#import' do
+      before { file_importer.import }
+
+      it { expect(model.count).to eql(5) }
     end
   end
 end

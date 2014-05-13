@@ -1,23 +1,21 @@
 module UsdaNutrientDatabase
   module Import
-    class Nutrients < Base
+    class Nutrients
+      FileImporter.register_file(self)
 
-      private
-
-      def find_or_initialize(row)
-        UsdaNutrientDatabase::Nutrient.
-          find_or_initialize_by(nutrient_number: row[0])
+      def filename
+        'NUTR_DEF.txt'
       end
 
-      def columns
-        @columns ||= [
+      def column_names
+        [
           :nutrient_number, :units, :tagname, :nutrient_description,
           :number_decimal_places, :sort_record_order
         ]
       end
 
-      def filename
-        'NUTR_DEF.txt'
+      def model
+        UsdaNutrientDatabase::Nutrient
       end
 
       def log_import_started

@@ -1,26 +1,19 @@
 namespace :usda do
   desc 'Import the latest USDA nutrition data'
   task import: :environment do
-    UsdaNutrientDatabase::Importer.new('tmp/usda', 'sr26').import
+    directory = Rails.root.join('tmp/usda')
+    importer = UsdaNutrientDatabase::Import::ArchiveImporter.new(directory)
+    importer.import_archive
   end
 
-  [
-    'Weights', 'Footnotes', 'FoodGroups', 'Foods', 'FoodsNutrients',
-    'Nutrients', 'SourceCodes'
-  ].each do |importer_name|
-    desc "Import the USDA #{importer_name} table"
-    task "import_#{importer_name.downcase}" => :environment do
-      download_and_import(importer_name)
-    end
-  end
+  UsdaNutrientDatabase::Import::FileImporter.file_classes.each do |file_class|
+    file_class_table_name = file_class.name.to_s.demodulize.underscore
 
-  def download_and_import(importer_name)
-    UsdaNutrientDatabase::Import::Downloader.new('tmp/usda', 'sr26').
-      tap do |downloader|
-      downloader.download_and_unzip
-      "UsdaNutrientDatabase::Import::#{importer_name}".constantize.
-        new('tmp/usda/sr25').import
-      downloader.cleanup
+    desc "Import the USDA #{file_class_table_name} table"
+    task "import_#{file_class_table_name}" => :environment do
+      directory = Rails.root.join('tmp/usda')
+      importer = UsdaNutrientDatabase::Import::ArchiveImporter.new(directory)
+      importer.import_file(file_class)
     end
   end
 end

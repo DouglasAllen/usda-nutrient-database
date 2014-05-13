@@ -1,23 +1,22 @@
 module UsdaNutrientDatabase
   module Import
-    class SourceCodes < Base
+    class SourceCodes
+      FileImporter.register_file(self)
 
-      private
-
-      def find_or_initialize(row)
-        UsdaNutrientDatabase::SourceCode.find_or_initialize_by(code: row[0])
+      def filename
+        'SRC_CD.txt'
       end
 
-      def columns
+      def column_names
         [:code, :description]
+      end
+
+      def model
+        UsdaNutrientDatabase::SourceCode
       end
 
       def log_import_started
         UsdaNutrientDatabase.log 'Source code import started'
-      end
-
-      def filename
-        'SRC_CD.txt'
       end
     end
   end
